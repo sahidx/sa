@@ -5,7 +5,7 @@ import crypto from 'crypto';
 // Environment schema validation
 const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
-  PORT: z.string().transform(Number).default(3000),
+  PORT: z.string().transform(Number).default('3000'),
   DATABASE_URL: z.string().url('Invalid database URL format'),
   SESSION_SECRET: z.string().min(32, 'Session secret must be at least 32 characters'),
   
@@ -15,30 +15,30 @@ const envSchema = z.object({
   SMS_API_URL: z.string().url().default('http://bulksmsbd.net/api/smsapi'),
   
   // Security
-  BCRYPT_ROUNDS: z.string().transform(Number).default(12),
+  BCRYPT_ROUNDS: z.string().transform(Number).default('12'),
   
   // Rate Limiting
-  RATE_LIMIT_WINDOW_MS: z.string().transform(Number).default(900000), // 15 minutes
-  RATE_LIMIT_MAX_REQUESTS: z.string().transform(Number).default(100),
+  RATE_LIMIT_WINDOW_MS: z.string().transform(Number).default('900000'), // 15 minutes
+  RATE_LIMIT_MAX_REQUESTS: z.string().transform(Number).default('100'),
   
   // CORS
   CORS_ORIGIN: z.string().default('http://localhost:3000'),
   
   // File Upload
-  MAX_FILE_SIZE: z.string().transform(Number).default(10485760), // 10MB
+  MAX_FILE_SIZE: z.string().transform(Number).default('10485760'), // 10MB
   
   // Logging
   LOG_LEVEL: z.enum(['error', 'warn', 'info', 'debug']).default('info'),
   
   // Database Pool
-  DB_POOL_MIN: z.string().transform(Number).default(5),
-  DB_POOL_MAX: z.string().transform(Number).default(20),
+  DB_POOL_MIN: z.string().transform(Number).default('5'),
+  DB_POOL_MAX: z.string().transform(Number).default('20'),
   
   // SSL/TLS
-  HTTPS: z.string().transform(val => val === 'true').default(false),
+  HTTPS: z.string().transform(val => val === 'true').default('false'),
   
   // Testing
-  TEST_DB_CONNECTION: z.string().transform(val => val === 'true').default(false)
+  TEST_DB_CONNECTION: z.string().transform(val => val === 'true').default('false')
 });
 
 // Validate and export environment
@@ -83,7 +83,7 @@ function validateEnvironment() {
         console.error(`   ${err.path.join('.')}: ${err.message}`);
       });
     } else {
-      console.error(`   ${error.message}`);
+      console.error(`   ${(error as Error).message}`);
     }
     process.exit(1);
   }
@@ -112,7 +112,7 @@ export const parseConnectionString = (url: string) => {
       ssl: parsed.searchParams.get('sslmode') === 'require'
     };
   } catch (error) {
-    throw new Error(`Invalid DATABASE_URL format: ${error.message}`);
+    throw new Error(`Invalid DATABASE_URL format: ${(error as Error).message}`);
   }
 };
 

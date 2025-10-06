@@ -2153,7 +2153,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         attempt,
         score: attempt.score,
         totalQuestions: attempt.totalQuestions,
-        percentage: Math.round((attempt.score / attempt.totalQuestions) * 100),
+        percentage: Math.round(((attempt.score || 0) / attempt.totalQuestions) * 100),
         results
       });
     } catch (error: any) {

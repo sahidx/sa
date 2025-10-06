@@ -78,7 +78,7 @@ export default function OnlineExamManager() {
   const { data: examWithQuestions, refetch: refetchQuestions } = useQuery({
     queryKey: ['/api/online-exams', selectedExam?.id],
     enabled: !!selectedExam,
-  });
+  }) as { data?: any; refetch: () => void };
 
   useMathJax([step, selectedExam?.id, editingQuestion?.id, JSON.stringify(examWithQuestions?.questions)]);
 
