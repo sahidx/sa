@@ -1,11 +1,12 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import { env } from "./env"; // Load and validate environment
 
 const app = express();
 app.set('trust proxy', true); // Trust proxy headers for rate limiting
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(express.json({ limit: `${env.MAX_FILE_SIZE}` }));
+app.use(express.urlencoded({ extended: false, limit: `${env.MAX_FILE_SIZE}` }));
 
 app.use((req, res, next) => {
   const start = Date.now();
@@ -61,16 +62,19 @@ app.use((req, res, next) => {
     serveStatic(app);
   }
 
-  // ALWAYS serve the app on the port specified in the environment variable PORT
-  // Other ports are firewalled. Default to 5000 if not specified.
-  // this serves both the API and the client.
-  // It is the only port that is not firewalled.
-  const port = parseInt(process.env.PORT || '5000', 10);
+  // Start server on configured port
+  const port = env.PORT;
   server.listen({
     port,
     host: "0.0.0.0",
     reusePort: true,
   }, () => {
-    log(`serving on port ${port}`);
+    log(`🚀 Server running on port ${port}`);
+    log(`🌐 Environment: ${env.NODE_ENV}`);
+    if (env.NODE_ENV === 'production') {
+      log(`📊 Access the application at: http://your-domain.com`);
+    } else {
+      log(`📊 Access the application at: http://localhost:${port}`);
+    }
   });
 })();

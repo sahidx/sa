@@ -43,18 +43,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
     legacyHeaders: false,
   });
 
-  // Session configuration
+  // Session configuration with PostgreSQL store
+  const connectPgSimple = require('connect-pg-simple');
+  const PgSession = connectPgSimple(session);
+  
   app.use(session({
-    secret: process.env.SESSION_SECRET || 'coaching-center-secret',
+    store: new PgSession({
+      pool: (await import('./db')).pool,
+      tableName: 'sessions',
+      createTableIfMissing: false // Table already exists in schema
+    }),
+    secret: process.env.SESSION_SECRET || crypto.randomBytes(64).toString('hex'),
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: false,
+      secure: process.env.NODE_ENV === 'production' && process.env.HTTPS === 'true',
       httpOnly: true,
-      maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      sameSite: 'lax'
     },
     rolling: true,
-    name: 'coaching.sid'
+    name: 'sa.sid'
   }));
 
   // Authentication middleware
