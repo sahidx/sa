@@ -64,11 +64,7 @@ app.use((req, res, next) => {
 
   // Start server on configured port
   const port = env.PORT;
-  server.listen({
-    port,
-    host: "0.0.0.0",
-    reusePort: true,
-  }, () => {
+  const httpServer = server.listen(port, "0.0.0.0", () => {
     log(`🚀 Server running on port ${port}`);
     log(`🌐 Environment: ${env.NODE_ENV}`);
     if (env.NODE_ENV === 'production') {
